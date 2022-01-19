@@ -17,6 +17,16 @@ class TestVicsek(unittest.TestCase):
 # we test the scenario of 9 particles in a box of size 3x3. Each particle sits in the
 #middle of one of the 9 boxes. Please remember the periodic boundary conditions.
 
+    """
+       column     0 1 2
+    row        8 |6 7 8| 6
+    -------------|-----|----
+    0          2 |0 1 2| 0
+    1          5 |3 4 5| 3
+    2          8 |6 7 8| 6
+    -------------|-----|----
+               2 |0 1 2| 0
+    """
     def  test_get_agent_ids_into_hash_table(self):
         #check that each box has exactly one agent after applying .for_testing()
         hash_table_values_list = list(vicsek_obj.hash_table.values())
