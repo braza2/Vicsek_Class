@@ -10,6 +10,3 @@ before_script:
   - pip install -I numpy==1.20.3
 script:
   - pytest -v --cov
-#  - cd ./test/
-#  - python test_vicsek_class.py
-#  - python -m pytest ./test/test_vicsek_class.py
