@@ -8,5 +8,7 @@ install:
 
 before_script:
   - pip install -I numpy==1.8.2
-#script:
+script:
+  - cd ./test/
+  - python test_vicsek_class.py
 #  - python -m pytest ./test/test_vicsek_class.py
