@@ -4,7 +4,10 @@ Created on Wed Jan 19 00:13:09 2022
 
 @author: Belal
 """
-from Vicsek_Class import Vicsek_Class
+
+import sys
+sys.path.append("..")
+from src.Vicsek_Class import Vicsek_Class
 import numpy as np
 import unittest
 
