@@ -37,9 +37,9 @@ class TestVicsek(unittest.TestCase):
         self.vicsek_obj = Vicsek_Class(self.N, self.Lx, self.Ly, self.vel, self.r,
                  self.tau, self.alpha, self.symmetry_parameter, self.diffusion_c, 
                     self.omega0, self.dt)
-        self.vicsek_obj.for_testing()
+        self.vicsek_obj._for_testing()
         self.vicsek_obj.update()
-        self.vicsek_obj.for_testing()
+        self.vicsek_obj._for_testing()
 # we test the scenario of 9 particles in a box of size 3x3. Each particle sits in the
 #middle of one of the 9 boxes. Please remember the periodic boundary conditions.
 
@@ -54,7 +54,7 @@ class TestVicsek(unittest.TestCase):
                2 |0 1 2| 0
     """
     def  test_get_agent_ids_into_hash_table(self):
-        #check that each box has exactly one agent after applying .for_testing()
+        #check that each box has exactly one agent after applying ._for_testing()
         hash_table_values_list = list(self.vicsek_obj.hash_table.values())
         hash_table_values_arr = np.array([item for sublist in hash_table_values_list for item in sublist])
         what_we_expect = np.arange(0, self.N, 1)
