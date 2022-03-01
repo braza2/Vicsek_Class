@@ -1,8 +1,7 @@
 import numpy as np
 import copy as cp
-#import matplotlib.pyplot as plt
-#import matplotlib.animation as animation
-#from matplotlib import collections  as mc  # <- for animation
+from nptyping import NDArray, Float64, Int
+
 
 
 class Vicsek_Class(object):
@@ -192,16 +191,16 @@ class Vicsek_Class(object):
 
 
     #rotate vector by angle phi
-    def for_testing(self):
-        self.coord[:, 0] = np.mod(np.arange(0, N, 1) + self.r/2, 3)
-        self.coord[:, 1] = np.sort(np.mod(np.arange(0, N, 1) + self.r/2, 3))
+    def _for_testing(self):
+        self.coord[:, 0] = np.mod(np.arange(0, self.N, 1) + self.r/2, 3)
+        self.coord[:, 1] = np.sort(np.mod(np.arange(0, self.N, 1) + self.r/2, 3))
         
-    def ang_to_vel(self, phi):
+    def ang_to_vel(self, phi: NDarray[Float64]) -> NDarray[Float64]:
         return self.v*np.cos(phi), self.v*np.sin(phi)
     # -------------------------------------------------------------------------------------------------------
 
     #return angle of vector
-    def vel_to_ang(self, vy, vx):
+    def vel_to_ang(self, vy: NDarray[Float64], vx: NDarray[Float64]) -> NDarray[Float64]:
         return np.arctan2(vy,vx)
     # -------------------------------------------------------------------------------------------------------
 
@@ -368,28 +367,28 @@ class Vicsek_Class(object):
     # -------------------------------------------------------------------------------------------------------
     
     
-Lx =3
-Ly = 3
-rho = 1
-N = 9
+#Lx =3
+#Ly = 3
+#rho = 1
+#N = 9
 # N = int(Lx*Ly*rho)
 
-r = 1.0
-dt = 1.0
+#r = 1.0
+#dt = 1.0
 
-k0 = -7.1e-4
-s0 =  542
-alpha = 1 # density weight
-symmetry_parameter = 2 #(1 = ferromagnetic, 2 = nematic) allignment
-vel = 0.5
-omega0 = vel*k0
-tau = s0/vel # memory time
-sigma_k = 1.8e-3
-diffusion_c = np.sqrt(2*sigma_k**2*vel**3/s0)
-phaser = Vicsek_Class(N, Lx, Ly, vel, r, tau, alpha, symmetry_parameter, diffusion_c, omega0, dt)
-phaser.hash_table
-phaser.for_testing()
-phaser.get_agent_ids_into_hash_table()
+#k0 = -7.1e-4
+#s0 =  542
+#alpha = 1 # density weight
+#symmetry_parameter = 2 #(1 = ferromagnetic, 2 = nematic) allignment
+#vel = 0.5
+#omega0 = vel*k0
+#tau = s0/vel # memory time
+#sigma_k = 1.8e-3
+#diffusion_c = np.sqrt(2*sigma_k**2*vel**3/s0)
+#phaser = Vicsek_Class(N, Lx, Ly, vel, r, tau, alpha, symmetry_parameter, diffusion_c, omega0, dt)
+#phaser.hash_table
+#phaser.for_testing()
+#phaser.get_agent_ids_into_hash_table()
 # phaser.hash_table
 # phaser.update()
 #
