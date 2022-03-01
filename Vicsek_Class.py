@@ -195,12 +195,12 @@ class Vicsek_Class(object):
         self.coord[:, 0] = np.mod(np.arange(0, self.N, 1) + self.r/2, 3)
         self.coord[:, 1] = np.sort(np.mod(np.arange(0, self.N, 1) + self.r/2, 3))
         
-    def ang_to_vel(self, phi: NDarray[Float64]) -> NDarray[Float64]:
+    def ang_to_vel(self, phi: NDArray[Float64]) -> NDArray[Float64]:
         return self.v*np.cos(phi), self.v*np.sin(phi)
     # -------------------------------------------------------------------------------------------------------
 
     #return angle of vector
-    def vel_to_ang(self, vy: NDarray[Float64], vx: NDarray[Float64]) -> NDarray[Float64]:
+    def vel_to_ang(self, vy: NDArray[Float64], vx: NDArray[Float64]) -> NDArray[Float64]:
         return np.arctan2(vy,vx)
     # -------------------------------------------------------------------------------------------------------
 
