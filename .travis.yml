@@ -9,6 +9,7 @@ install:
 before_script:
   - pip install -I numpy==1.20.3
   - pip install pytest-cov
+  - pip install nptyping
 script:
   - pytest -v --cov=./ --cov-report=xml
 
