@@ -1,7 +1,7 @@
 import numpy as np
 import copy as cp
 from nptyping import NDArray, Float64, Int
-
+from typing import List
 
 
 class Vicsek_Class(object):
@@ -159,8 +159,8 @@ class Vicsek_Class(object):
         self.box_size_y = self.Ly/float(int(self.Ly/self.r))
         self.M = self.Nx * self.Ny
         self.hash_table = {}
-        self.get_hash_tables() #-hash_table, keys initalize
-        self.get_hash_table_neighborboxes()
+        self._get_hash_tables() #-hash_table, keys initalize
+        self._get_hash_table_neighborboxes()
         # initialize simulation variables: coord, and coord_next.
         # coord = np.array([N rows (particles), 5 columns(space, direction, noise (from ornstein-uhlenbeck))])     
         self.coord = np.zeros((self.N, 5))
@@ -192,38 +192,45 @@ class Vicsek_Class(object):
 
     #rotate vector by angle phi
     def _for_testing(self):
+
         self.coord[:, 0] = np.mod(np.arange(0, self.N, 1) + self.r/2, 3)
         self.coord[:, 1] = np.sort(np.mod(np.arange(0, self.N, 1) + self.r/2, 3))
         
     def ang_to_vel(self, phi: NDArray[Float64]) -> NDArray[Float64]:
+
         return self.v*np.cos(phi), self.v*np.sin(phi)
     # -------------------------------------------------------------------------------------------------------
 
-    #return angle of vector
+    #return angle of vector for single particle
     def vel_to_ang(self, vy: NDArray[Float64], vx: NDArray[Float64]) -> NDArray[Float64]:
+
         return np.arctan2(vy,vx)
     # -------------------------------------------------------------------------------------------------------
 
     #get average angle from array of angles
-    def get_avg(self, ang_array):
+    def get_avg(self, ang_array: NDArray[Float64]) -> NDArray[Float64]:
+
         x = np.sum(np.cos(ang_array))
         y = np.sum(np.sin(ang_array))
         return np.arctan2(y,x)
     # -------------------------------------------------------------------------------------------------------
 
     #move particles with euler step. also use modulo for periodic boundary conditions
-    def move_agents(self):
+    def _move_agents(self):
+
         self.coord_next[:, 0] = np.mod(self.coord[:, 0] + self.coord[:, 2] * self.dt, self.Lx)
         self.coord_next[:, 1] = np.mod(self.coord[:, 1] + self.coord[:, 3] * self.dt, self.Ly)
     # -------------------------------------------------------------------------------------------------------
 
     #get array of all angles for all particles
-    def get_angles(self):
-        self.phi_array = (np.arctan2(self.coord[:,3], self.coord[:,2]))
+    def _get_angles(self):
+
+        self.phi_array = (np.arctan2(self.coord[:, 3], self.coord[:, 2]))
     # -------------------------------------------------------------------------------------------------------
 
     #test velocities for normalization
     def testvelocities(self):
+
     	x = self.coord_next[:,2:4]
     	speed = np.sqrt(x[:,0]**2 + x[:,1]**2)
     	if np.any(~np.isclose(speed, self.v)):
@@ -231,7 +238,8 @@ class Vicsek_Class(object):
     # -------------------------------------------------------------------------------------------------------
 
     #initalize hash tables hash = {keys:value}, keys = box number (1d array index), value = list with ids of particles in box with number=key
-    def get_hash_tables(self):
+    def _get_hash_tables(self):
+
         #first check if Simulation box size and interaction radius are compatible.
         if (not np.isclose(self.Lx/self.r, int(self.Nx))):
             print("r and Nx or Ny not compatible, grid square size "+str(self.Nx)+"x"+str(self.box_size_x)+" - "+str(self.Ny)+"x"+str(self.box_size_y)+" greater than interaction radius"+str(self.r))
@@ -242,7 +250,8 @@ class Vicsek_Class(object):
     # -------------------------------------------------------------------------------------------------------
 
     #map agent_id onto key values in hash table and keys array
-    def get_agent_ids_into_hash_table(self):
+    def _get_agent_ids_into_hash_table(self):
+
         for k in range(0, self.N): #loop over agents
             j = int(self.coord[k, 0]/self.r) #column id of box
             i = int(self.coord[k, 1]/self.r) #row id of box
@@ -252,7 +261,8 @@ class Vicsek_Class(object):
     # -------------------------------------------------------------------------------------------------------
 
     #get keys of neighboring boxes for box number at grid position i,j
-    def get_neighborboxes_ids(self, i, j):
+    def get_neighborboxes_ids(self, i: int, j: int) -> List[int]:
+
         ne_boxes = [] #initalize list of neighbor boxes of box at indices i and j.
         for k in range(i - 1, i + 2): #loop over boxes one above and one below
             p = k % self.Ny #periodic boundary conditions
@@ -265,7 +275,8 @@ class Vicsek_Class(object):
 
     #create hash table where keys are 1d box numbers and values are lists with 9 elements, containing ids of
     #the 8 neigbhbor boxes including the own
-    def get_hash_table_neighborboxes(self):
+    def _get_hash_table_neighborboxes(self):
+
         for i in range(0, self.M): #loop over all M boxes
             m, n = np.unravel_index(i, (int(self.Nx), int(self.Ny))) #2d representation of box position
             
@@ -275,7 +286,8 @@ class Vicsek_Class(object):
 
     #shift position vectors if agents are identified in neighboring boxes due to 
     #periodic boundary conditions
-    def shiftvectors(self, coord_ne, m, n, a, b):
+    def shiftvectors(self, coord_ne: NDArray[Float64], m: int, n: int, a: int, b: int) -> NDArray[Float64]:
+
         if  np.abs(m - a) > 1: #for y
             alpha = (m - a)/np.abs(m - a)
             coord_ne[:, 1] += alpha * self.Ly
@@ -286,7 +298,9 @@ class Vicsek_Class(object):
     
     
     # -------------------------------------------------------------------------------------------------------
-    def get_neighbor_ind_i_nbor_id_norm(self, nbor_id, x_i, y_i, m, n):
+    def get_neighbor_ind_i_nbor_id_norm(self, nbor_id: int, x_i: NDArray[Float64], 
+                y_: NDArray[Float64], m: int, n: int) -> NDArray[Float64]:
+
         ind_in_box_ne = self.hash_table[nbor_id]   #id of agents in neigborbox ne
         coord_ne = self.coord[ind_in_box_ne, 0:2]         #slice coord array
         a, b = np.unravel_index(nbor_id, (int(self.Nx), int(self.Ny)))    #get 2d grid position of neighbor box ne
@@ -297,7 +311,8 @@ class Vicsek_Class(object):
     
     # -------------------------------------------------------------------------------------------------------
     #get ids of neighboring agent for agent i
-    def get_neighbor_ind_i(self, i):
+    def get_neighbor_ind_i(self, i: int) -> List[int]:
+
         neighbors_list = [] #initalize list of neighbor indices (1d representation)
         box_id = self.keys[i]  #agent i is in the box with id box_id
         m, n = np.unravel_index(box_id, (int(self.Nx), int(self.Ny)))  #get 2d grid positon m, n of box_id
@@ -321,8 +336,8 @@ class Vicsek_Class(object):
     # -------------------------------------------------------------------------------------------------------
      
     #update direction   
-    def update_direction(self, i, neighbors):
-        phi_i = self.vel_to_ang(self.coord[i, 3],self.coord[i, 2])  #angle of particle i
+    def _update_direction(self, i: int, neighbors: List[int]):
+        phi_i = self.vel_to_ang(self.coord[i, 3], self.coord[i, 2])  #angle of particle i
         phi_dot = 0     #initialize phi_dot
 
         for x in neighbors:
@@ -335,116 +350,37 @@ class Vicsek_Class(object):
     # -------------------------------------------------------------------------------------------------------   
      
     #integrate ornstein-uhlenbeck process   
-    def integrate_ou_process(self):
+    def _integrate_ou_process(self):
+
         drift = (self.coord[:, 4] - self.omega0)/self.tau
         noise = np.random.normal(loc=0.0, scale=1.0) * np.sqrt(self.dt)
         self.coord_next[:, 4] = self.coord[:, 4] + drift * self.dt + self.diffusion * noise
     # -------------------------------------------------------------------------------------------------------
 
     #update order parameter
-    def update_order_parameter(self):
-        self.sum_x = np.sum(self.coord_next[:,2])
-        self.sum_y = np.sum(self.coord_next[:,3])
+    def _update_order_parameter(self):
+
+        self.sum_x = np.sum(self.coord_next[:, 2])
+        self.sum_y = np.sum(self.coord_next[:, 3])
         self.order_parameter = 1./self.N * 1./self.v * np.sqrt((self.sum_x)**2+(self.sum_y)**2)
     # -------------------------------------------------------------------------------------------------------
     
     #run simulation, update system
     def update(self):
         #update steps
-        self.get_agent_ids_into_hash_table()  # assign agents into boxes: fills hash_table, keys global
-        self.get_angles()  #phi_array global
-        self.move_agents()       #move agents
-        self.integrate_ou_process() #integrate ornstein-uhlenbeck
+        self._get_agent_ids_into_hash_table()  # assign agents into boxes: fills hash_table, keys global
+        self._get_angles()  #phi_array global
+        self._move_agents()       #move agents
+        self._integrate_ou_process() #integrate ornstein-uhlenbeck
 
         for i in range(0, self.N):
             neighborhood_ids = self.get_neighbor_ind_i(i)
-            self.update_direction(i, neighborhood_ids)
+            self._update_direction(i, neighborhood_ids)
 
-        self.update_order_parameter() # update order parameter values
+        self._update_order_parameter() # update order parameter values
         # set coordiantes to new coordiantes
         self.coord = cp.deepcopy(self.coord_next)
 #        self.testvelocities()
     # -------------------------------------------------------------------------------------------------------
-    
-    
-#Lx =3
-#Ly = 3
-#rho = 1
-#N = 9
-# N = int(Lx*Ly*rho)
-
-#r = 1.0
-#dt = 1.0
-
-#k0 = -7.1e-4
-#s0 =  542
-#alpha = 1 # density weight
-#symmetry_parameter = 2 #(1 = ferromagnetic, 2 = nematic) allignment
-#vel = 0.5
-#omega0 = vel*k0
-#tau = s0/vel # memory time
-#sigma_k = 1.8e-3
-#diffusion_c = np.sqrt(2*sigma_k**2*vel**3/s0)
-#phaser = Vicsek_Class(N, Lx, Ly, vel, r, tau, alpha, symmetry_parameter, diffusion_c, omega0, dt)
-#phaser.hash_table
-#phaser.for_testing()
-#phaser.get_agent_ids_into_hash_table()
-# phaser.hash_table
-# phaser.update()
-#
-#
-#
-# import matplotlib.pyplot as plt
-# from matplotlib import collections  as mc 
-# fig = plt.figure()
-# ax1 = plt.subplot2grid((3,2),(1,0),colspan=2,rowspan=2)
-# ax2 = plt.subplot2grid((3,2),(0,0),colspan=2)
-
-    
-# vvecs = phaser.coord[:,2:4]
-# rvecs = phaser.coord[:,0:2]
-# scat = ax1.scatter([], [], marker = ".")
-# scat.set_offsets(rvecs)
-# ax1.set_xlim(0, phaser.Lx)
-# ax1.set_ylim(0, phaser.Ly)
-# ax1.set_xlabel('Simulation')
-# lines = []
-# for i in range(0, phaser.N):
-#     x = rvecs[i, 0]
-#     y = rvecs[i, 1]
-#     vx = vvecs[i, 0]
-#     vy = vvecs[i, 1]
-#     x1 = x + .5 * vx
-#     y1 = y + .5 * vy
-#     tp = [(x, y), (x1, y1)]
-#     lines.append(tp)
-# lc = mc.LineCollection(lines, colors = "r")
-# ax1.add_collection(lc)
-
-# ax2.set_xlim([0,10])
-# ax2.set_ylim([0,1.1])
-# ax2.set_title('Time')
-# ax2.set_ylabel('$\phi$',fontsize=20)
-# line, = ax2.plot([], [])        
-
-# return scat, lc, line   
-
-    
-    
-
-# Lx =3
-# Ly = 3
-# rho = 1
-# N = 9
-# r = 1.0
-# dt = 1.0
-# k0 = -7.1e-4
-# s0 =  542
-# alpha = 1 # density weight
-# symmetry_parameter = 2 #(1 = ferromagnetic, 2 = nematic) allignment
-# vel = 0.5
-# omega0 = vel*k0
-# tau = s0/vel # memory time
-# sigma_k = 1.8e-3
-# diffusion_c = np.sqrt(2*sigma_k**2*vel**3/s0)
-# vicsek_obj = Vicsek_Class(N, Lx, Ly, vel, r, tau, alpha, symmetry_parameter, diffusion_c, omega0, dt)
+    #end of class -------------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------------------------------------
