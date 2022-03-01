@@ -299,7 +299,7 @@ class Vicsek_Class(object):
     
     # -------------------------------------------------------------------------------------------------------
     def get_neighbor_ind_i_nbor_id_norm(self, nbor_id: int, x_i: NDArray[Float64], 
-                y_: NDArray[Float64], m: int, n: int) -> NDArray[Float64]:
+                y_i: NDArray[Float64], m: int, n: int) -> NDArray[Float64]:
 
         ind_in_box_ne = self.hash_table[nbor_id]   #id of agents in neigborbox ne
         coord_ne = self.coord[ind_in_box_ne, 0:2]         #slice coord array
