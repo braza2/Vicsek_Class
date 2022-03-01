@@ -180,7 +180,7 @@ class Vicsek_Class(object):
 
         #create initial order parameter
         self.order_parameter = 0
-        self.update_order_parameter()
+        self._update_order_parameter()
 
 #        self.testvelocities()
         #class variable defined in the running simulation
